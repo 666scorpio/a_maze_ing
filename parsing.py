@@ -36,9 +36,12 @@ def parse_config(path):
             keys_required = [
                 "WIDTH", "HEIGHT", "ENTRY", "EXIT",
                 "OUTPUT_FILE", "PERFECT"]
+            acceptable_keys = [
+                "WIDTH", "HEIGHT", "ENTRY", "EXIT",
+                "OUTPUT_FILE", "PERFECT", "SEED"]
             config = {}
             for line in lines:
-                line = line.strip()
+                line = line.split("#",1)[0].strip()
                 if not line:
                     continue
                 if line.startswith("#"):
@@ -47,7 +50,7 @@ def parse_config(path):
                     raise ValueError("bad syntax :" + line)
                 key, value = line.split("=", 1)
                 key = key.strip()
-                if key not in keys_required:
+                if key not in acceptable_keys:
                     raise ValueError("bad syntax :" + line)
                 value = value.strip()
                 value_supposed(key, value, line)
@@ -60,7 +63,7 @@ def parse_config(path):
                     config[key] = value
             for key in keys_required:
                 if key not in config:
-                    raise ValueError(f"Missing required key in config file: {key}")
+                    raise ValueError(f"Missing an required key in config file")
             for point_key in ("ENTRY", "EXIT"):
                 x, y = config[point_key]
                 if x < 0 or x >= config["WIDTH"]\
