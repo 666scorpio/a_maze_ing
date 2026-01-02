@@ -20,7 +20,7 @@ class MazeGenerator:
         self.width = width
         self.height = height
         self.entry = entry
-        self.exit = exit_
+        self.exit_ = exit_
         self.grid = []
         self.seed = seed
         self.perfect = perfect
@@ -82,9 +82,7 @@ class MazeGenerator:
                 self.maze_gen(x1, y1)
             i += 1
 
-        def place_42_pattern(grid):
-            if self.height < 8 or self.width < 11:
-                raise ValueError("the fucking maze too small for the fucking pattern")
+        def _place_42_pattern(self, entry, exit_):
             pattern_4 = [
                 [1, 0, 0, 0, 1],
                 [1, 0, 0, 0, 1],
@@ -107,14 +105,47 @@ class MazeGenerator:
                 [1, 0, 0, 0, 0],
                 [1, 1, 1, 1, 1],
             ]
-            pattern_height = 8
-            pattern_width = 10
-            center_row = (self.height - pattern_height) // 2
-            center_col = (self.width - pattern_width) // 2
+            
+            pattern_height = 9
+            pattern_width = 11
+            
+            if self.height <= pattern_height or self.width <= pattern_width:
+                raise ValueError("the fucking maze too small for the pattern baby")
+
+            center_r = (self.height - pattern_height) // 2
+            center_c = (self.width - pattern_width) // 2
+
             starts = []
             for start_row in range(1, self.height - pattern_height):
                 for start_col in range(1, self.width - pattern_width):
-                    starts.append()
+                    starts.append((start_row, start_col))
+            
+            starts_with_dist = []
+            for start_row, start_col in starts:
+                dist = abs(start_row - center_r) + abs(start_col - center_c)
+                starts_with_dist.append((start_row, start_col, dist))
+            
+            starts_with_dist.sort(key=lambda x:x[2])
+            sorted_starts = [(start_r, start_c) for start_r, start_c, dist in starts_with_dist]
+
+            forbidden = set()
+            if entry is not None:
+                forbidden.add(entry)
+            if exit_ is not None:
+                forbidden.add(exit_)
+
+            coords = set()
+            for r in range(pattern_height):
+                for c in range(5):
+                    if pattern_4[r][c] == 1:
+                        coords.add((r + start_row, c + start_col))
+
+            for r in range(pattern_height):
+                for c in range(5):
+                    if pattern_2[r][c] == 1:
+                        coords.add((r + start_row, c + 6 + start_col))
+            return coords
+            
 
 from maze_printer import print_ascii_maze
 width = int(input("width "))
