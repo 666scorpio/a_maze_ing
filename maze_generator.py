@@ -82,12 +82,44 @@ class MazeGenerator:
                 self.maze_gen(x1, y1)
             i += 1
 
-
+        def place_42_pattern(grid):
+            if self.height < 8 or self.width < 11:
+                raise ValueError("the fucking maze too small for the fucking pattern")
+            pattern_4 = [
+                [1, 0, 0, 0, 1],
+                [1, 0, 0, 0, 1],
+                [1, 0, 0, 0, 1],
+                [1, 0, 0, 0, 1],
+                [1, 1, 1, 1, 1],
+                [0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 1],
+            ]
+            pattern_2 = [
+                [1, 1, 1, 1, 1],
+                [0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 1],
+                [1, 1, 1, 1, 1],
+                [1, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0],
+                [1, 1, 1, 1, 1],
+            ]
+            pattern_height = 8
+            pattern_width = 10
+            center_row = (self.height - pattern_height) // 2
+            center_col = (self.width - pattern_width) // 2
+            starts = []
+            for start_row in range(1, self.height - pattern_height):
+                for start_col in range(1, self.width - pattern_width):
+                    starts.append()
 
 from maze_printer import print_ascii_maze
 width = int(input("width "))
 height = int(input("height "))
 maze = MazeGenerator(width, height, 0, 0, 42, False)
 #maze.print_maze()
-#print_ascii_maze(maze.grid)
+print_ascii_maze(maze.grid)
 #print(maze.count)
