@@ -144,6 +144,8 @@ class MazeGenerator:
                 for c in range(5):
                     if pattern_2[r][c] == 1:
                         coords.add((r + start_row, c + 6 + start_col))
+            if coords & forbidden:
+                raise ValueError("error")
             return coords
             
 
