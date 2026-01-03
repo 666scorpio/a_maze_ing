@@ -74,7 +74,7 @@ def parse_config(path):
                     raise ValueError(
                         f"Line {line_number}: Unknown configuration "
                         f"key '{key}'\n"
-                        f"→ {line}"
+                        f"→ {line}"+
                                     )
                 value = value.strip()
                 value_supposed(key, value, line, line_number)

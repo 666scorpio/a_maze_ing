@@ -1,5 +1,6 @@
 import random
 from hexa_writer import convert_to_hex
+import sys
 
 class Cell:
     def __init__(self, x, y):
@@ -24,6 +25,7 @@ class MazeGenerator:
         self.grid = []
         self.seed = seed
         self.perfect = perfect
+        sys.setrecursionlimit(150000000)
         for x in range(self.height):
             row = []
             for y in range(self.width):
