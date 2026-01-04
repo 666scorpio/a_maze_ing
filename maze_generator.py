@@ -69,7 +69,7 @@ class MazeGenerator:
                 if not self.grid[r][c].visited:
                     if algorithm == "DFS":
                         self.maze_gen1(r, c)
-                    elif algorithm =="PRIM":
+                    elif algorithm == "PRIM":
                         self.maze_gen2(r, c)
                     break
             else:
@@ -170,8 +170,6 @@ class MazeGenerator:
         if x - 1 >= 0 and not self.grid[x - 1][y].visited:
             neighbors.append((x - 1, y))
 
-
-
     def maze_gen1(self, x: int, y: int) -> None:
         """Recursive backtracking maze generation starting from cell (x, y)."""
         if self.grid[x][y].visited:
@@ -194,13 +192,13 @@ class MazeGenerator:
                 self.grid[x1][y1].walls[opposite[wall]] = False
                 self.maze_gen1(x1, y1)
             i += 1
-        if self.perfect == False:
+        if self.perfect is False:
             self.make_imperfect()
 
-    def make_imperfect(self):
+    def make_imperfect(self) -> None:
         ratio = 0.1
-        attempts = self.height * self.width * ratio
-        
+        attempts = int(self.height * self.width * ratio)
+
         for i in range(attempts):
             x = random.randint(1, self.height - 1)
             y = random.randint(1, self.width - 1)
@@ -214,7 +212,7 @@ class MazeGenerator:
                 neighbors.append((x, y + 1))
             if y - 1 > 0:
                 neighbors.append((x, y - 1))
-            
+
             if not neighbors:
                 continue
             neighbor = random.choice(neighbors)
@@ -224,19 +222,19 @@ class MazeGenerator:
             self.grid[x][y].walls[wall] = False
             self.grid[x1][y1].walls[opposite[wall]] = False
 
-    def maze_gen2(self, x, y):
-        self.frontier = []
+    def maze_gen2(self, x: int, y: int) -> None:
+        self.frontier: list[tuple[int, int, int, int]] = []
         self.grid[x][y].visited = True
         self.add_frontier(x, y)
         self.prim_algo()
 
-    def add_frontier(self, x, y):
+    def add_frontier(self, x: int, y: int) -> None:
         for x1, y1 in [(x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)]:
             if 0 <= x1 < self.height and 0 <= y1 < self.width:
                 if not self.grid[x1][y1].visited:
                     self.frontier.append((x, y, x1, y1))
- 
-    def prim_algo(self):
+
+    def prim_algo(self) -> None:
         while self.frontier:
             index = random.randint(0, len(self.frontier) - 1)
             x, y, x1, y1 = self.frontier.pop(index)
@@ -257,3 +255,5 @@ class MazeGenerator:
             self.grid[tx][ty].walls[opposite[wall]] = False
             self.grid[tx][ty].visited = True
             self.add_frontier(tx, ty)
+        if self.perfect is False:
+            self.make_imperfect()
