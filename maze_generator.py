@@ -37,6 +37,7 @@ class MazeGenerator:
         exit_: Optional[coord],
         seed: Optional[int],
         perfect: bool,
+        algorithm: str,
     ) -> None:
         """Initialize the maze generator and build the maze."""
         self.count = 0
@@ -66,13 +67,15 @@ class MazeGenerator:
         for r in range(self.height):
             for c in range(self.width):
                 if not self.grid[r][c].visited:
-                    self.maze_gen(r, c)
+                    if algorithm == "DFS":
+                        self.maze_gen1(r, c)
+                    elif algorithm =="PRIM":
+                        self.maze_gen2(r, c)
                     break
             else:
                 continue
             break
 
-        self.maze_gen(0, 0)
         convert_to_hex(self.grid, "maze.txt")
 
     def the_wall(self, x: int, y: int, x1: int, y1: int) -> str:
@@ -98,7 +101,30 @@ class MazeGenerator:
         if x - 1 >= 0 and not self.grid[x - 1][y].visited:
             neighbors.append((x - 1, y))
 
-    def maze_gen(self, x: int, y: int) -> None:
+    def maze_gen2(self, x, y):
+        self.frontier = []
+        self.add_frontier(x, y)
+        self.prim_algo()
+
+    def add_frontier(self, x, y):
+        for x1, y1 in [(x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)]:
+            if 0 <= x1 < self.height and 0 <= y1 < self.width:
+                if not self.grid[x1][y1].visited:
+                    self.frontier.append((x, y, x1, y1))
+ 
+    def prim_algo(self):
+        while self.frontier:
+            index = random.randint(0, len(self.frontier) - 1)
+            x, y, x1, y1 = self.frontier.pop(index)
+            self.grid[x][y].visited = True
+            wall = self.the_wall(x, y, x1, y1)
+            opposite = {"N": "S", "S": "N", "W": "E", "E": "W"}
+            self.grid[x][y].walls[wall] = False
+            self.grid[x1][y1].walls[opposite[wall]] = False
+            self.grid[x1][y1].visited = True
+            self.add_frontier(x1, y1)
+
+    def maze_gen1(self, x: int, y: int) -> None:
         """Recursive backtracking maze generation starting from cell (x, y)."""
         if self.grid[x][y].visited:
             return
@@ -118,8 +144,38 @@ class MazeGenerator:
                 opposite = {"N": "S", "S": "N", "W": "E", "E": "W"}
                 self.grid[x][y].walls[wall] = False
                 self.grid[x1][y1].walls[opposite[wall]] = False
-                self.maze_gen(x1, y1)
+                self.maze_gen1(x1, y1)
             i += 1
+        if self.perfect == False:
+            self.make_imperfect()
+
+    def make_imperfect(self):
+        ratio = 0.1
+        attempts = self.height * self.width * ratio
+        
+        for i in range(attempts):
+            x = random.randint(1, self.height - 1)
+            y = random.randint(1, self.width - 1)
+
+            neighbors = []
+            if x + 1 < self.height:
+                neighbors.append((x + 1, y))
+            if x - 1 > 0:
+                neighbors.append((x - 1, y))
+            if y + 1 < self.width:
+                neighbors.append((x, y + 1))
+            if y - 1 > 0:
+                neighbors.append((x, y - 1))
+            
+            if not neighbors:
+                continue
+            neighbor = random.choice(neighbors)
+            x1, y1 = neighbor
+            wall = self.the_wall(x, y, x1, y1)
+            opposite = {"N": "S", "S": "N", "W": "E", "E": "W"}
+            self.grid[x][y].walls[wall] = False
+            self.grid[x1][y1].walls[opposite[wall]] = False
+
 
     def place_42_pattern(
         self, entry: Optional[coord], exit_: Optional[coord]
