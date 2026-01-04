@@ -226,6 +226,7 @@ class MazeGenerator:
 
     def maze_gen2(self, x, y):
         self.frontier = []
+        self.grid[x][y].visited = True
         self.add_frontier(x, y)
         self.prim_algo()
 
@@ -239,12 +240,20 @@ class MazeGenerator:
         while self.frontier:
             index = random.randint(0, len(self.frontier) - 1)
             x, y, x1, y1 = self.frontier.pop(index)
-            self.grid[x][y].visited = True
-            wall = self.the_wall(x, y, x1, y1)
+            v1 = self.grid[x][y].visited
+            v2 = self.grid[x1][y1].visited
+            if v1 == v2:
+                continue
+            if v1:
+                fx, fy = x, y
+                tx, ty = x1, y1
+            else:
+                fx, fy = x1, y1
+                tx, ty = x, y
+
+            wall = self.the_wall(fx, fy, tx, ty)
             opposite = {"N": "S", "S": "N", "W": "E", "E": "W"}
-            self.grid[x][y].walls[wall] = False
-            self.grid[x1][y1].walls[opposite[wall]] = False
-            self.grid[x1][y1].visited = True
-            self.add_frontier(x1, y1)
-
-
+            self.grid[fx][fy].walls[wall] = False
+            self.grid[tx][ty].walls[opposite[wall]] = False
+            self.grid[tx][ty].visited = True
+            self.add_frontier(tx, ty)
